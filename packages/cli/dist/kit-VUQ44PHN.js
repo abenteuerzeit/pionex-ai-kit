@@ -5,7 +5,7 @@ import {
   runSetup,
   version,
   writeFullConfig
-} from "./chunk-P3F7NIBO.js";
+} from "./chunk-Q65DNPZO.js";
 
 // src/kit.ts
 import { createInterface } from "readline";
@@ -98,4 +98,4 @@ function buildKitProgram() {
 export {
   buildKitProgram
 };
-//# sourceMappingURL=kit-CR5ACHEN.js.map
+//# sourceMappingURL=kit-VUQ44PHN.js.map
