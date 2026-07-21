@@ -792,5 +792,118 @@ export function registerBotTools(): ToolSpec[] {
         return (await client.signedPost("/api/v1/bot/signal/listener", { signalType, signalParam, base, quote, time, price, data })).data;
       },
     },
+    // ── User Signal CRUD ──────────────────────────────────────────────────────
+    {
+      name: "pionex_bot_user_signal_list",
+      module: "bot",
+      isWrite: false,
+      description:
+        "List user-defined signals (paginated). Returns signalType, title, description, confirmConfig, and tradingviewConfig for each signal. " +
+        "Endpoint: GET /api/v1/bot/signal/userSignal",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          pageToken: { type: "string", description: "Pagination token from previous response. Omit for first page." },
+        },
+      },
+      async handler(args, { client }) {
+        const q: QueryParams = {};
+        if (args.pageToken != null) q.pageToken = String(args.pageToken);
+        return (await client.signedGet("/api/v1/bot/signal/userSignal", q)).data;
+      },
+    },
+    {
+      name: "pionex_bot_user_signal_get",
+      module: "bot",
+      isWrite: false,
+      description:
+        "Get detail of a specific user-defined signal including webhook URL and TradingView message template. " +
+        "Endpoint: GET /api/v1/bot/signal/userSignal/detail",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["signalType"],
+        properties: {
+          signalType: { type: "string", description: "Signal type identifier (UUID)." },
+        },
+      },
+      async handler(args, { client }) {
+        const signalType = asNonEmptyString(args.signalType, "signalType");
+        return (await client.signedGet("/api/v1/bot/signal/userSignal/detail", { signalType })).data;
+      },
+    },
+    {
+      name: "pionex_bot_user_signal_create",
+      module: "bot",
+      isWrite: true,
+      description:
+        "Create a new user-defined signal. Returns signalType, webhookUrl, and TradingView message template. Max 100 signals per user. " +
+        "Endpoint: POST /api/v1/bot/signal/userSignal",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["title"],
+        properties: {
+          title: { type: "string", description: "Signal name (max 100 chars).", maxLength: 100 },
+          description: { type: "string", description: "Signal description (max 1000 chars).", maxLength: 1000 },
+        },
+      },
+      async handler(args, { client, config }) {
+        if (config.readOnly) throw new Error("Server is running in --read-only mode; user signal create is disabled.");
+        const title = asNonEmptyString(args.title, "title");
+        const body: Record<string, unknown> = { title };
+        if (args.description != null) body.description = String(args.description);
+        return (await client.signedPost("/api/v1/bot/signal/userSignal", body)).data;
+      },
+    },
+    {
+      name: "pionex_bot_user_signal_edit",
+      module: "bot",
+      isWrite: true,
+      description:
+        "Update the title and/or description of an existing user-defined signal. At least one field must be provided. " +
+        "Endpoint: POST /api/v1/bot/signal/userSignal/edit",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["signalType"],
+        properties: {
+          signalType: { type: "string", description: "Signal type identifier (UUID)." },
+          title: { type: "string", description: "New signal name (max 100 chars).", maxLength: 100 },
+          description: { type: "string", description: "New signal description (max 1000 chars).", maxLength: 1000 },
+        },
+      },
+      async handler(args, { client, config }) {
+        if (config.readOnly) throw new Error("Server is running in --read-only mode; user signal edit is disabled.");
+        const signalType = asNonEmptyString(args.signalType, "signalType");
+        const body: Record<string, unknown> = {};
+        if (args.title != null) body.title = String(args.title);
+        if (args.description != null) body.description = String(args.description);
+        if (!body.title && !body.description) throw new Error("At least one of title or description must be provided.");
+        return (await client.signedPostQuery("/api/v1/bot/signal/userSignal/edit", { signalType }, body)).data;
+      },
+    },
+    {
+      name: "pionex_bot_user_signal_delete",
+      module: "bot",
+      isWrite: true,
+      description:
+        "Delete a user-defined signal. Fails with SIGNAL_HAS_UNCLOSED_ORDERS if any non-cancelled orders exist for the signal. " +
+        "Endpoint: DELETE /api/v1/bot/signal/userSignal/delete",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["signalType"],
+        properties: {
+          signalType: { type: "string", description: "Signal type identifier (UUID)." },
+        },
+      },
+      async handler(args, { client, config }) {
+        if (config.readOnly) throw new Error("Server is running in --read-only mode; user signal delete is disabled.");
+        const signalType = asNonEmptyString(args.signalType, "signalType");
+        return (await client.signedDeleteQuery("/api/v1/bot/signal/userSignal/delete", { signalType })).data;
+      },
+    },
   ];
 }

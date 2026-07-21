@@ -101,6 +101,18 @@ export class PionexRestClient {
     return { endpoint: path, requestTime: new Date().toISOString(), data };
   }
 
+  public async signedPostQuery<TData = unknown>(path: string, query: QueryParams, body: Record<string, unknown>): Promise<RequestResult<TData>> {
+    const bodyJson = JSON.stringify(body);
+    const { url, headers, bodyJson: bj } = buildSignedRequest(this.config, "POST", path, query, bodyJson);
+    const res = await fetch(url, { method: "POST", headers, body: bj ?? undefined });
+    if (!res.ok) {
+      const txt = await readTextSafe(res);
+      throw new PionexApiError(`HTTP ${res.status}: ${txt || res.statusText}`, { status: res.status, endpoint: path, responseText: txt });
+    }
+    const data = (await res.json()) as TData;
+    return { endpoint: path, requestTime: new Date().toISOString(), data };
+  }
+
   public async signedDelete<TData = unknown>(path: string, body: Record<string, unknown>): Promise<RequestResult<TData>> {
     const bodyJson = JSON.stringify(body);
     const { url, headers, bodyJson: bj } = buildSignedRequest(this.config, "DELETE", path, {}, bodyJson);
