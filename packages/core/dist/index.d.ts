@@ -64,6 +64,7 @@ declare class PionexRestClient {
     publicGet<TData = unknown>(path: string, query?: QueryParams): Promise<RequestResult<TData>>;
     signedGet<TData = unknown>(path: string, query?: QueryParams): Promise<RequestResult<TData>>;
     signedPost<TData = unknown>(path: string, body: Record<string, unknown>): Promise<RequestResult<TData>>;
+    signedPostQuery<TData = unknown>(path: string, query: QueryParams, body: Record<string, unknown>): Promise<RequestResult<TData>>;
     signedDelete<TData = unknown>(path: string, body: Record<string, unknown>): Promise<RequestResult<TData>>;
     signedDeleteQuery<TData = unknown>(path: string, query?: QueryParams): Promise<RequestResult<TData>>;
 }

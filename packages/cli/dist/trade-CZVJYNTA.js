@@ -7,7 +7,7 @@ import {
   print,
   toToolErrorPayload,
   version
-} from "./chunk-CU7GOKVR.js";
+} from "./chunk-MPJE26PT.js";
 
 // src/trade.ts
 import { Command as Command8 } from "commander";
@@ -691,6 +691,80 @@ function buildSignalCommand() {
       process.exit(1);
     }
   });
+  sig.command("user_signal_list").description("List user-defined signals (paginated)").option("--page-token <token>", "Pagination token from previous response").action(async (opts, cmd) => {
+    try {
+      const run = makeRunner(cmd);
+      const out = await run("pionex_bot_user_signal_list", { pageToken: opts.pageToken });
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  sig.command("user_signal_get").description("Get detail of a user-defined signal").requiredOption("--signal-type <uuid>", "Signal type identifier").action(async (opts, cmd) => {
+    try {
+      const run = makeRunner(cmd);
+      const out = await run("pionex_bot_user_signal_get", { signalType: opts.signalType });
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  sig.command("user_signal_create").description(
+    "Create a new user-defined signal\n  Example: pionex-trade-cli bot signal user_signal_create --title 'My Signal' [--dry-run]"
+  ).requiredOption("--title <title>", "Signal name (max 100 chars)").option("--description <desc>", "Signal description (max 1000 chars)").action(async (opts, cmd) => {
+    try {
+      const payload = { title: opts.title };
+      if (opts.description) payload.description = opts.description;
+      if (isDryRun(cmd)) {
+        print({ tool: "pionex_bot_user_signal_create", args: payload });
+        return;
+      }
+      const run = makeRunner(cmd);
+      const out = await run("pionex_bot_user_signal_create", payload);
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  sig.command("user_signal_edit").description(
+    "Edit title or description of a user-defined signal\n  Example: pionex-trade-cli bot signal user_signal_edit --signal-type <uuid> --title 'New Title' [--dry-run]"
+  ).requiredOption("--signal-type <uuid>", "Signal type identifier").option("--title <title>", "New signal name (max 100 chars)").option("--description <desc>", "New signal description (max 1000 chars)").action(async (opts, cmd) => {
+    try {
+      const payload = { signalType: opts.signalType };
+      if (opts.title) payload.title = opts.title;
+      if (opts.description) payload.description = opts.description;
+      if (isDryRun(cmd)) {
+        print({ tool: "pionex_bot_user_signal_edit", args: payload });
+        return;
+      }
+      const run = makeRunner(cmd);
+      const out = await run("pionex_bot_user_signal_edit", payload);
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  sig.command("user_signal_delete").description(
+    "Delete a user-defined signal (fails if unclosed orders exist)\n  Example: pionex-trade-cli bot signal user_signal_delete --signal-type <uuid> [--dry-run]"
+  ).requiredOption("--signal-type <uuid>", "Signal type identifier").action(async (opts, cmd) => {
+    try {
+      const payload = { signalType: opts.signalType };
+      if (isDryRun(cmd)) {
+        print({ tool: "pionex_bot_user_signal_delete", args: payload });
+        return;
+      }
+      const run = makeRunner(cmd);
+      const out = await run("pionex_bot_user_signal_delete", payload);
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
   return sig;
 }
 function buildBotCommand() {
@@ -992,4 +1066,4 @@ function buildTradeProgram() {
 export {
   buildTradeProgram
 };
-//# sourceMappingURL=trade-7C6QBKTK.js.map
+//# sourceMappingURL=trade-CZVJYNTA.js.map
