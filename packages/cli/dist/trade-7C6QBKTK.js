@@ -7,7 +7,7 @@ import {
   print,
   toToolErrorPayload,
   version
-} from "./chunk-P3F7NIBO.js";
+} from "./chunk-CU7GOKVR.js";
 
 // src/trade.ts
 import { Command as Command8 } from "commander";
@@ -870,9 +870,64 @@ function buildDualCommand() {
   });
   return dual;
 }
+function buildArbitrageCommand() {
+  const arbitrage = new Command6("arbitrage").description("Earn Arbitrage (InstFund) commands");
+  arbitrage.command("fetchProducts").description("List available Earn Arbitrage products (requires read auth)").option("--coin <coin>", "Filter by coin (e.g. USDT)").option("--visibility <visibility>", "Visibility filter").action(async (opts, cmd) => {
+    try {
+      const run = makeRunner(cmd);
+      const out = await run("pionex_earn_arbitrage_fetch_products", { coin: opts.coin, visibility: opts.visibility });
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  arbitrage.command("fetchUserBalances").description("Get Earn Arbitrage balances (requires read auth)").option("--business-type <n>", "Business type filter", parseInt).action(async (opts, cmd) => {
+    try {
+      const run = makeRunner(cmd);
+      const out = await run("pionex_earn_arbitrage_fetch_user_balances", { businessType: opts.businessType });
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  arbitrage.command("stake").description("Stake into an Earn Arbitrage product (requires earn auth)").requiredOption("--amount <amount>", "Amount to stake").requiredOption("--coin <coin>", "Coin to stake (e.g. USDT)").requiredOption("--product-id <id>", "Product ID from fetchProducts").option("--unique-id <id>", "Client-assigned idempotency key").action(async (opts, cmd) => {
+    try {
+      const payload = { amount: opts.amount, coin: opts.coin, productId: opts.productId, uniqueId: opts.uniqueId };
+      if (isDryRun(cmd)) {
+        print({ tool: "pionex_earn_arbitrage_stake", args: payload });
+        return;
+      }
+      const run = makeRunner(cmd);
+      const out = await run("pionex_earn_arbitrage_stake", payload);
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  arbitrage.command("unStake").description("Unstake from an Earn Arbitrage product (requires earn auth)").requiredOption("--amount <amount>", "Amount to unstake").requiredOption("--coin <coin>", "Coin to unstake (e.g. USDT)").requiredOption("--product-id <id>", "Product ID").option("--unique-id <id>", "Client-assigned idempotency key").option("--unstake-id <id>", "Unstake record ID").action(async (opts, cmd) => {
+    try {
+      const payload = { amount: opts.amount, coin: opts.coin, productId: opts.productId, uniqueId: opts.uniqueId, unstakeId: opts.unstakeId };
+      if (isDryRun(cmd)) {
+        print({ tool: "pionex_earn_arbitrage_un_stake", args: payload });
+        return;
+      }
+      const run = makeRunner(cmd);
+      const out = await run("pionex_earn_arbitrage_un_stake", payload);
+      print(out.data);
+    } catch (e) {
+      process.stderr.write(JSON.stringify(toToolErrorPayload(e), null, 2) + "\n");
+      process.exit(1);
+    }
+  });
+  return arbitrage;
+}
 function buildEarnCommand() {
   const earn = new Command6("earn").description("Earn products (requires auth)");
   earn.addCommand(buildDualCommand());
+  earn.addCommand(buildArbitrageCommand());
   return earn;
 }
 
@@ -937,4 +992,4 @@ function buildTradeProgram() {
 export {
   buildTradeProgram
 };
-//# sourceMappingURL=trade-PUFF7IDV.js.map
+//# sourceMappingURL=trade-7C6QBKTK.js.map

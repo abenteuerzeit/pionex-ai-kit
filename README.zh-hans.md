@@ -46,6 +46,7 @@ Pionex AI Kit 为你提供一整套连接 Pionex 的 AI Agent 基础设施，包
 |                                    | **Bot / Futures Grid** | `pionex_bot_futures_grid_get_order`、`pionex_bot_futures_grid_create`、`pionex_bot_futures_grid_adjust_params`、`pionex_bot_futures_grid_reduce`、`pionex_bot_futures_grid_cancel`                                                                                                                            | 是   |
 |                                    | **Bot / Spot Grid**    | `pionex_bot_spot_grid_get_order`、`pionex_bot_spot_grid_get_ai_strategy`、`pionex_bot_spot_grid_create`、`pionex_bot_spot_grid_adjust_params`、`pionex_bot_spot_grid_invest_in`、`pionex_bot_spot_grid_cancel`、`pionex_bot_spot_grid_profit`                                                                   | 是   |
 |                                    | **Earn / Dual**        | `pionex_earn_dual_symbols`、`pionex_earn_dual_open_products`、`pionex_earn_dual_prices`、`pionex_earn_dual_index`、`pionex_earn_dual_delivery_prices`、`pionex_earn_dual_balances`、`pionex_earn_dual_get_invests`、`pionex_earn_dual_records`、`pionex_earn_dual_invest`、`pionex_earn_dual_revoke_invest`、`pionex_earn_dual_collect` | 部分（公开 + 鉴权） |
+|                                    | **Earn / Arbitrage**   | `pionex_earn_arbitrage_fetch_products`、`pionex_earn_arbitrage_fetch_user_balances`、`pionex_earn_arbitrage_stake`、`pionex_earn_arbitrage_un_stake` | 是 |
 
 ---
 
@@ -59,10 +60,11 @@ Pionex AI Kit 为你提供一整套连接 Pionex 的 AI Agent 基础设施，包
 | [pionex-trade](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-trade/SKILL.md)         | 现货订单：下单、撤单、查询挂单、成交记录     | 是   |
 | [pionex-bot](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-bot/SKILL.md)             | 合约网格：查询、创建、调参、减仓、撤单       | 是   |
 | [pionex-earn-dual](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-earn-dual/SKILL.md)   | 双币理财：查产品、申购、撤单、收益提取       | 部分 |
+| [pionex-earn-arbitrage](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-earn-arbitrage/SKILL.md) | 套利理财（InstFund）：查产品、查余额、申购、赎回 | 是 |
 
 ### CLI
 
-**`pionex-trade-cli`** —— 通过命令行直接访问 Pionex 行情、账户、订单、合约网格机器人与双币理财
+**`pionex-trade-cli`** —— 通过命令行直接访问 Pionex 行情、账户、订单、合约网格机器人、双币理财与套利理财
 
 ---
 
@@ -211,6 +213,40 @@ pionex-trade-cli earn dual invest \
   --profit 0.0039 \
   --dry-run
 ```
+
+</details>
+
+**套利理财（earn arbitrage）**
+
+<details>
+<summary>完整流程 — 查产品 → 申购 → 赎回</summary>
+
+```bash
+# 1. 查询可用套利产品
+pionex-trade-cli earn arbitrage fetchProducts --coin USDT
+
+# 2. 查询持仓余额
+pionex-trade-cli earn arbitrage fetchUserBalances
+
+# 3. 申购（先用 --dry-run 确认）
+pionex-trade-cli earn arbitrage stake \
+  --coin USDT \
+  --product-id 400 \
+  --amount 100 \
+  --unique-id my-stake-001 \
+  --dry-run
+
+# 去掉 --dry-run 提交真实申购
+
+# 4. 赎回（先用 --dry-run 确认）
+pionex-trade-cli earn arbitrage unStake \
+  --coin USDT \
+  --product-id 400 \
+  --amount 100 \
+  --unique-id my-stake-001 \
+  --dry-run
+```
+</details>
 
 </details>
 
