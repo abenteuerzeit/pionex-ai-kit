@@ -8,9 +8,10 @@ import { registerWalletTools } from "./wallet.js";
 import { registerOrdersTools } from "./orders.js";
 import { registerBotTools } from "./bot.js";
 import { registerEarnDualTools } from "./earn-dual.js";
+import { registerEarnArbitrageTools } from "./earn-arbitrage.js";
 
 function allToolSpecs(): ToolSpec[] {
-  return [...registerMarketTools(), ...registerAccountTools(), ...registerWalletTools(), ...registerOrdersTools(), ...registerBotTools(), ...registerEarnDualTools()];
+  return [...registerMarketTools(), ...registerAccountTools(), ...registerWalletTools(), ...registerOrdersTools(), ...registerBotTools(), ...registerEarnDualTools(), ...registerEarnArbitrageTools()];
 }
 
 export function buildTools(config: PionexConfig): ToolSpec[] {

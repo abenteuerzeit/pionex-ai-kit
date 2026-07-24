@@ -47,6 +47,7 @@ MCP servers for trading on Pionex.
 |                                    | **Bot / Spot Grid**    | `pionex_bot_spot_grid_get_order`, `pionex_bot_spot_grid_get_ai_strategy`, `pionex_bot_spot_grid_create`, `pionex_bot_spot_grid_adjust_params`, `pionex_bot_spot_grid_invest_in`, `pionex_bot_spot_grid_cancel`, `pionex_bot_spot_grid_profit`                                                                   | Yes  |
 |                                    | **Bot / Signal**       | `pionex_bot_user_signal_list`, `pionex_bot_user_signal_get`, `pionex_bot_user_signal_create`, `pionex_bot_user_signal_edit`, `pionex_bot_user_signal_delete`                                                                                                                                                    | Yes  |
 |                                    | **Earn / Dual**        | `pionex_earn_dual_symbols`, `pionex_earn_dual_open_products`, `pionex_earn_dual_prices`, `pionex_earn_dual_index`, `pionex_earn_dual_delivery_prices`, `pionex_earn_dual_balances`, `pionex_earn_dual_get_invests`, `pionex_earn_dual_records`, `pionex_earn_dual_invest`, `pionex_earn_dual_revoke_invest`, `pionex_earn_dual_collect` | Partial (public + auth) |
+|                                    | **Earn / Arbitrage**   | `pionex_earn_arbitrage_fetch_products`, `pionex_earn_arbitrage_fetch_user_balances`, `pionex_earn_arbitrage_stake`, `pionex_earn_arbitrage_un_stake` | Yes |
 
 ---
 
@@ -60,10 +61,11 @@ MCP servers for trading on Pionex.
 | [pionex-trade](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-trade/SKILL.md)         | Spot orders: place, cancel, open orders, fills               | Yes  |
 | [pionex-bot](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-bot/SKILL.md)             | Futures Grid Bot, Spot Grid Bot, Smart Copy, user-defined signal CRUD | Yes  |
 | [pionex-earn-dual](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-earn-dual/SKILL.md)   | Dual Investment: query products, invest, revoke, collect     | Partial |
+| [pionex-earn-arbitrage](https://github.com/pionex-official/pionex-skills/blob/main/skills/pionex-earn-arbitrage/SKILL.md) | Earn Arbitrage (InstFund): fetch products, balances, stake, unstake | Yes |
 
 ### CLI
 
-**`pionex-trade-cli`** — Direct command-line access to Pionex market data, account, orders, futures grid bot, user-defined signal CRUD, and Dual Investment operations
+**`pionex-trade-cli`** — Direct command-line access to Pionex market data, account, orders, futures grid bot, user-defined signal CRUD, Dual Investment, and Earn Arbitrage operations
 
 ---
 
@@ -249,6 +251,38 @@ pionex-trade-cli earn dual collect \
   --client-dual-id my-order-001
 ```
 
+</details>
+
+**Earn Arbitrage (InstFund)**
+
+<details>
+<summary>Full workflow — fetch products → stake → unstake</summary>
+
+```bash
+# 1. List available arbitrage products
+pionex-trade-cli earn arbitrage fetchProducts --coin USDT
+
+# 2. Check your balances
+pionex-trade-cli earn arbitrage fetchUserBalances
+
+# 3. Stake (dry-run first)
+pionex-trade-cli earn arbitrage stake \
+  --coin USDT \
+  --product-id 400 \
+  --amount 100 \
+  --unique-id my-stake-001 \
+  --dry-run
+
+# Remove --dry-run to submit the real order.
+
+# 4. Unstake (dry-run first)
+pionex-trade-cli earn arbitrage unStake \
+  --coin USDT \
+  --product-id 400 \
+  --amount 100 \
+  --unique-id my-stake-001 \
+  --dry-run
+```
 </details>
 
 </details>
