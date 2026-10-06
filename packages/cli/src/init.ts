@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { buildTradeProgram } from "./trade.js";
+import { buildKitProgram } from "./kit.js";
 
-buildTradeProgram()
+buildKitProgram()
   .parseAsync(process.argv)
   .catch((e) => {
     process.stderr.write(String(e) + "\n");
